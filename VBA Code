@@ -1,0 +1,114 @@
+Sub Ticker_And_Volume()
+
+For Each ws In Worksheets
+
+'Set variable for holding Ticker Symbol
+Dim Ticker_Letter As String
+
+'Set variable for holding Total volume per Ticker
+'Dim Total_Stock_Volume As Long
+Total_Stock_Volume = 0
+
+'Define the final row for each worksheet
+Dim Last_Row As Double
+Last_Row = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+Dim Stock_Close As Double
+Stock_Close = 0
+  
+Dim Stock_Open As Double
+Stock_Open = 0
+  
+'Dim P_Change As Double
+'P_Change = 0
+
+'Dim Per_Change As Double
+'Per_Change = 0
+
+'Define table to track locations
+Dim Summary_Table_Row  As Integer
+Summary_Table_Row = 2
+
+'Loop through data
+For I = 2 To Last_Row
+
+
+  'Check to see if ticker is the same
+  If ws.Cells(I + 1, 1).Value <> ws.Cells(I, 1).Value Then
+  
+    'Set Ticker column
+    Ticker_Letter = ws.Cells(I, 1).Value
+    
+    'Add to total stock volume
+    Total_Stock_Volume = Total_Stock_Volume + ws.Cells(I, 7).Value
+    
+    'Add Stock open
+    Stock_Open = Stock_Open + ws.Cells(I, 3).Value
+    
+    'Add Stock close
+    'I dont't think that this definition is right, and that is why all of my data is coming up wrong. I'm havn't been able to figure out how to iterate
+    'through and grab the last close for each ticker. It kind of got to the point where I'd allocated so much time to this that I felt like I was falling
+    'behind on python stuff so I just thought that I'd show what I've done. 
+    Stock_Close = Stock_Close + ws.Cells(I, 6).Value
+    
+    
+    'Define Price Change
+    P_Change = (Stock_Close - Stock_Open)
+    
+    'Define Percentage Change
+   If Stock_Open = 0 Then
+    Per_Change = 0
+    
+    Else
+    Per_Change = Round(P_Change / Stock_Open, 2)
+    
+    End If
+    
+    Stock_Open = ws.Cells(I + 1, 3)
+    
+    'Print Value
+    ws.Range("K" & Summary_Table_Row).Value = P_Change
+    
+    ws.Range("L" & Summary_Table_Row).Value = Per_Change
+    
+    ws.Range("J" & Summary_Table_Row).Value = Ticker_Letter
+    
+    ws.Range("M" & Summary_Table_Row).Value = Total_Stock_Volume
+    
+    'Colour Formatting
+    
+    If P_Change > 0 Then
+    ws.Range("K" & Summary_Table_Row).Interior.ColorIndex = 4
+    
+    ElseIf P_Change < 0 Then
+    ws.Range("K" & Summary_Table_Row).Interior.ColorIndex = 3
+    
+    Else
+    ws.Range("K" & Summary_Table_Row).Interior.ColorIndex = 2
+    
+    End If
+    
+    'Headers
+    ws.Cells(1, 10).Value = "Ticker"
+    ws.Cells(1, 11).Value = "Yearly Change"
+    ws.Cells(1, 12).Value = "Percentage Change"
+    ws.Cells(1, 13).Value = "Total Stock Volume"
+    
+    
+    Summary_Table_Row = Summary_Table_Row + 1
+    
+    'Reset Total Stock Volume Total
+    Total_Stock_Volume = 0
+    
+    'Reset Stock Open and close to zero
+    P_Change = 0
+    Per_Change = 0
+    
+    
+  Else
+    'Add To Total Stock Volume
+    Total_Stock_Volume = Total_Stock_Volume + ws.Cells(I, 7).Value
+  End If
+  Next I
+  Next ws
+  End Sub
